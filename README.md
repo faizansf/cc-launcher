@@ -4,7 +4,7 @@
 ![license](https://img.shields.io/github/license/faizansf/cc-launcher)
 ![downloads](https://img.shields.io/npm/dm/cc-launcher)
 
-![Demo](assets/demo.gif)
+![Demo](assets/demo-v0.4.1.gif)
 
 **Switch Claude Code providers instantly. No config edits. No restarts.**
 
