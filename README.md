@@ -1,5 +1,11 @@
 # CC Launcher
 
+![npm](https://img.shields.io/npm/v/cc-launcher)
+![license](https://img.shields.io/github/license/faizansf/cc-launcher)
+![downloads](https://img.shields.io/npm/dm/cc-launcher)
+
+![Demo](assets/demo.gif)
+
 **Switch Claude Code providers instantly. No config edits. No restarts.**
 
 Run Claude Code with any provider or API key in seconds using a simple CLI.
