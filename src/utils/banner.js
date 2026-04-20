@@ -12,10 +12,6 @@ function shortenDir() {
 }
 
 export function showBanner() {
-  // First frame: full screen clear + cursor home.
-  // Subsequent frames: cursor home + clear-to-end-of-screen — preserves the
-  // scrollback buffer above so previous output isn't destroyed, but gives
-  // the menu a clean starting position.
   if (_firstFrame) {
     process.stdout.write('\x1b[2J\x1b[H');
     _firstFrame = false;

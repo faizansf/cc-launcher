@@ -25,8 +25,6 @@ export function launchClaude(env, claudeArgs = []) {
   });
 }
 
-// POSIX single-quote escape: values inside single quotes are literal except for '.
-// Close the string, emit an escaped ', and reopen: foo'bar → 'foo'\''bar'
 function shellQuote(value) {
   return `'${String(value).replace(/'/g, `'\\''`)}'`;
 }
