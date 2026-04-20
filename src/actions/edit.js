@@ -2,7 +2,7 @@ import { select, input, password, confirm } from '@inquirer/prompts';
 import { getAllCredentials, getCredentials, saveCredentials, renameCredentials } from '../config.js';
 import { getProviderDef } from '../providers/index.js';
 import { maskSecret } from '../utils/mask.js';
-import { promptTheme, formatMenu, backChoice, withCancel, CANCELLED } from '../utils/theme.js';
+import { selectTheme, formatMenu, withCancel, CANCELLED } from '../utils/theme.js';
 import pc from 'picocolors';
 
 export async function editCredentials() {
@@ -12,28 +12,22 @@ export async function editCredentials() {
   if (slugs.length === 0) {
     const choice = await withCancel(select, {
       message: 'No credentials yet. What would you like to do?',
-      choices: [
-        ...formatMenu([{ label: 'Add credentials', value: 'add' }]),
-        backChoice,
-      ],
-      theme: promptTheme,
+      choices: formatMenu([{ label: 'Add credentials', value: 'add' }]),
+      theme: selectTheme,
     });
     return choice === CANCELLED ? 'back' : choice;
   }
 
   const slug = await withCancel(select, {
     message: 'Which credentials to edit?',
-    choices: [
-      backChoice,
-      ...formatMenu(slugs.map(s => ({
-        label: all[s].name,
-        desc: all[s].provider,
-        value: s,
-      }))),
-    ],
-    theme: promptTheme,
+    choices: formatMenu(slugs.map(s => ({
+      label: all[s].name,
+      desc: all[s].provider,
+      value: s,
+    }))),
+    theme: selectTheme,
   });
-  if (slug === CANCELLED || slug === 'back') return 'back';
+  if (slug === CANCELLED) return 'back';
 
   const current = getCredentials(slug);
   const provider = getProviderDef(current.provider);

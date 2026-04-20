@@ -2,7 +2,7 @@ import { select } from '@inquirer/prompts';
 import { getAllCredentials, getCredentials } from '../config.js';
 import { launchClaude, buildCommand, checkClaudeInstalled } from '../utils/spawn.js';
 import { maskSecret } from '../utils/mask.js';
-import { promptTheme, formatMenu, backChoice, withCancel, CANCELLED } from '../utils/theme.js';
+import { selectTheme, formatMenu, withCancel, CANCELLED } from '../utils/theme.js';
 import pc from 'picocolors';
 
 export async function useCredentials(slug, claudeArgs = [], printOnly = false) {
@@ -45,33 +45,27 @@ export async function useCredentials(slug, claudeArgs = [], printOnly = false) {
   if (slugs.length === 0) {
     const choice = await withCancel(select, {
       message: 'No credentials yet. What would you like to do?',
-      choices: [
-        ...formatMenu([{ label: 'Add credentials', value: 'add' }]),
-        backChoice,
-      ],
-      theme: promptTheme,
+      choices: formatMenu([{ label: 'Add credentials', value: 'add' }]),
+      theme: selectTheme,
     });
     return choice === CANCELLED ? 'back' : choice;
   }
 
   const selected = await withCancel(select, {
     message: 'Select credentials to launch with:',
-    choices: [
-      backChoice,
-      ...formatMenu(slugs.map(s => {
-        const c = all[s];
-        const token = c.env.ANTHROPIC_AUTH_TOKEN ? maskSecret(c.env.ANTHROPIC_AUTH_TOKEN) : 'no key';
-        return {
-          label: c.name,
-          desc: `${c.provider} · ${token}`,
-          value: s,
-        };
-      })),
-    ],
-    theme: promptTheme,
+    choices: formatMenu(slugs.map(s => {
+      const c = all[s];
+      const token = c.env.ANTHROPIC_AUTH_TOKEN ? maskSecret(c.env.ANTHROPIC_AUTH_TOKEN) : 'no key';
+      return {
+        label: c.name,
+        desc: `${c.provider} · ${token}`,
+        value: s,
+      };
+    })),
+    theme: selectTheme,
   });
 
-  if (selected === CANCELLED || selected === 'back') return 'back';
+  if (selected === CANCELLED) return 'back';
 
   const creds = all[selected];
 

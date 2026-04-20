@@ -1,7 +1,7 @@
 import { search, input, password } from '@inquirer/prompts';
 import { getAllProviders, getProviderDef } from '../providers/index.js';
 import { getAllCredentials, saveCredentials } from '../config.js';
-import { promptTheme, formatMenu, backChoice, withCancel, CANCELLED } from '../utils/theme.js';
+import { promptTheme, selectTheme, formatMenu, withCancel, CANCELLED } from '../utils/theme.js';
 import pc from 'picocolors';
 
 export async function addCredentials() {
@@ -13,21 +13,18 @@ export async function addCredentials() {
     return 'back';
   }
 
-  const providerChoices = [
-    backChoice,
-    ...formatMenu(providers.map(p => ({ label: p.name, value: p.id }))),
-  ];
+  const providerItems = formatMenu(providers.map(p => ({ label: p.name, value: p.id })));
 
   const providerId = await withCancel(search, {
     message: 'Choose a provider:',
     source: (input) => {
-      if (!input) return providerChoices;
+      if (!input) return providerItems;
       const q = input.toLowerCase();
-      return providerChoices.filter(c => c.value === 'back' || c.value?.toLowerCase().includes(q) || c.name?.toLowerCase().includes(q));
+      return providerItems.filter(c => c.value?.toLowerCase().includes(q) || c.name?.toLowerCase().includes(q));
     },
-    theme: promptTheme,
+    theme: selectTheme,
   });
-  if (providerId === CANCELLED || providerId === 'back') return 'back';
+  if (providerId === CANCELLED) return 'back';
   const provider = getProviderDef(providerId);
 
   console.log(pc.dim(`\n  A label to identify these credentials in menus.`));

@@ -15,10 +15,10 @@ export const CANCELLED = Symbol('cancelled');
 // while staying imperceptible.
 const ESC_WINDOW_MS = 30;
 
-// Wraps an @inquirer/prompts prompt so that Esc and Ctrl-C both resolve
-// to the CANCELLED sentinel instead of throwing. We bypass readline's
-// keypress parser for Esc and detect raw 0x1B on the data event so we can
-// use our own (short) disambiguation window.
+// Wraps an @inquirer/prompts prompt so that Esc resolves to CANCELLED and
+// Ctrl-C exits the process immediately. We bypass readline's keypress parser
+// for Esc and detect raw 0x1B on the data event so we can use our own
+// (short) disambiguation window.
 export async function withCancel(prompt, config) {
   const ac = new AbortController();
   let escTimer = null;
@@ -45,7 +45,11 @@ export async function withCancel(prompt, config) {
     // Inquirer takes (config, context) — signal lives in context, not config.
     return await prompt(config, { signal: ac.signal });
   } catch (err) {
-    if (err.name === 'AbortPromptError' || err.name === 'ExitPromptError') return CANCELLED;
+    if (err.name === 'AbortPromptError') return CANCELLED;
+    if (err.name === 'ExitPromptError') {
+      console.log(pc.dim('\n  Goodbye!\n'));
+      process.exit(0);
+    }
     throw err;
   } finally {
     if (process.stdin.isTTY) process.stdin.off('data', onData);
@@ -76,11 +80,7 @@ export function getVersion() {
   return _version;
 }
 
-// Shared theme for @inquirer/prompts calls. The prompt message itself is
-// bold and self-explanatory — no leading `?` glyph (it's visual noise on
-// every prompt). The selection cursor is a heavy `❯` in bold orange so
-// the user's eye lands on it immediately; the highlighted row echoes the
-// same orange without painting every non-selected row.
+// Shared theme for @inquirer/prompts calls.
 export const promptTheme = {
   prefix: '',
   icon: {
@@ -92,8 +92,21 @@ export const promptTheme = {
   },
 };
 
+// Theme for select/search prompts in submenus. Appends an Esc hint to the
+// built-in key legend so users know how to go back without a dedicated list item.
+export const selectTheme = {
+  ...promptTheme,
+  style: {
+    ...promptTheme.style,
+    keysHelpTip: (keys) =>
+      [...keys, ['Esc', 'back']]
+        .map(([key, action]) => `${pc.bold(key)} ${pc.dim(action)}`)
+        .join(pc.dim(' • ')),
+  },
+};
+
 // Format a list of primary menu entries as aligned "LABEL    — description"
-// rows. Labels are bold; the em-dash description is dim. `short` drops the
+// rows. Labels are bold; the description is dim. `short` drops the
 // vertical-alignment padding so inquirer's post-answer inline echo reads as
 // a single clean row rather than the padded list cell.
 export function formatMenu(entries) {
@@ -106,6 +119,3 @@ export function formatMenu(entries) {
     return { name, value: e.value, short };
   });
 }
-
-// A dim "← Back to menu" entry for submenus.
-export const backChoice = { name: pc.dim('← Back to menu'), value: 'back' };
