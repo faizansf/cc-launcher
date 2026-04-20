@@ -39,7 +39,7 @@ export async function showHelp() {
   const providers = getAllProviders();
   if (providers.length > 0) {
     console.log(`  ${pc.bold('Providers')}`);
-    console.log(`   ${providers.map(p => p.name).join(SEP)}`);
+    for (const p of providers) console.log(`   ${p.name}`);
     console.log();
   }
 

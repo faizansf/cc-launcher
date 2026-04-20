@@ -88,7 +88,7 @@ export const promptTheme = {
   },
   style: {
     highlight: (text) => orange(text),
-    message: (text) => pc.bold(text),
+    message: (text) => text ? pc.bold(text) : '',
   },
 };
 
