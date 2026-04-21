@@ -14,8 +14,6 @@ Run Claude Code with any provider or API key in seconds using a simple CLI.
 npx cc-launcher
 ```
 
----
-
 ## 🚀 Why CC Launcher?
 
 Claude Code requires editing `~/.claude/settings.json` to switch providers. That process is slow, error-prone, and breaks flow.
@@ -26,8 +24,6 @@ CC Launcher solves this by:
 * Keeping your config untouched
 * Letting you switch providers with a single command
 
----
-
 ## ✨ Features
 
 * 🔁 **Instant provider switching**
@@ -37,8 +33,6 @@ CC Launcher solves this by:
 * 🧰 **CLI + automation friendly**
 * 🛡️ **Safe credential storage (0600 permissions)**
 
----
-
 ## 🔥 Common Use Cases
 
 * Compare providers like OpenRouter, DeepSeek, Ollama
@@ -46,8 +40,6 @@ CC Launcher solves this by:
 * Use **cheap vs premium models** dynamically
 * Toggle between **local (Ollama) and cloud APIs**
 * Run Claude Code in **CI pipelines with env injection**
-
----
 
 ## ⚡ Quick Start
 
@@ -67,8 +59,6 @@ npx cc-launcher launch zai-personal -- --model sonnet
 
 First run takes ~10 seconds. After that, switching is instant.
 
----
-
 ## 🎯 Commands
 
 | Command                        | Description                           |
@@ -80,8 +70,6 @@ First run takes ~10 seconds. After that, switching is instant.
 | `cc-launcher launch <slug> --print` | Output env vars only             |
 | `cc-launcher launch <slug> -- <args>` | Forward args to Claude Code    |
 | `--credentials <slug>`         | Legacy alias for `launch <slug>`      |
-
----
 
 ## 🌐 Supported Providers
 
@@ -101,8 +89,6 @@ Works with any **Anthropic-compatible API**, including:
 * NVIDIA NIM
 * and more
 
----
-
 ## 🧩 Add Your Own Provider
 
 ```js
@@ -118,8 +104,6 @@ export default {
 
 Register it and it appears automatically in CLI.
 
----
-
 ## 📁 Config
 
 Stored at:
@@ -130,8 +114,6 @@ Stored at:
 
 * Permission: `0600`
 * Plaintext storage (do not commit)
-
----
 
 ## 📦 Install
 
@@ -147,14 +129,10 @@ git clone https://github.com/faizansf/cc-launcher.git
 cd cc-launcher && npm link
 ```
 
----
-
 ## 🛠 Requirements
 
 * Node.js 18+
 * Claude Code installed (`claude` in PATH)
-
----
 
 ## ⭐ Why people star this repo
 
@@ -169,13 +147,9 @@ cd cc-launcher && npm link
 * Allow centralized config distribution within trusted environments
 * Improve team collaboration without sharing API keys directly
 
----
-
 ## 🤝 Contributing
 
 PRs welcome. Add providers, improve UX, or suggest features.
-
----
 
 ## 📄 License
 
