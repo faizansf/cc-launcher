@@ -6,7 +6,7 @@
 
 ![Demo](assets/demo--0.4.1.gif)
 
-**Switch Claude Code providers instantly. No config edits. No restarts.**
+**Switch Claude Code providers instantly. No config edits required.**
 
 Run Claude Code with any provider or API key in seconds using a simple CLI.
 
@@ -158,10 +158,16 @@ cd cc-launcher && npm link
 
 ## ⭐ Why people star this repo
 
-* Saves time every single day
-* Eliminates config headaches
-* Works with all major LLM providers
-* Clean, focused CLI experience
+* Saves time every day
+* Removes setup friction
+* Works with major LLM providers
+
+## 🚧 Roadmap
+
+* Add support for custom config file location
+* Enable network-based config loading via secure private sources (no public URL exposure)
+* Allow centralized config distribution within trusted environments
+* Improve team collaboration without sharing API keys directly
 
 ---
 
