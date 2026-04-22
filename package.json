@@ -1,6 +1,6 @@
 {
   "name": "cc-launcher",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Easily manage and switch inference provider configurations",
   "type": "module",
   "bin": {
