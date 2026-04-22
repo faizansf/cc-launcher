@@ -1,6 +1,6 @@
 import { select, confirm } from '@inquirer/prompts';
 import { getAllCredentials, removeCredentials } from '../config.js';
-import { selectTheme, formatMenu, withCancel, CANCELLED } from '../utils/theme.js';
+import { selectTheme, promptTheme, formatMenu, withCancel, CANCELLED } from '../utils/theme.js';
 import pc from 'picocolors';
 
 export async function deleteCredentialsAction() {

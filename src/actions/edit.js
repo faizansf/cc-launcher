@@ -2,7 +2,7 @@ import { select, input, password, confirm } from '@inquirer/prompts';
 import { getAllCredentials, getCredentials, saveCredentials, renameCredentials } from '../config.js';
 import { getProviderDef } from '../providers/index.js';
 import { maskSecret } from '../utils/mask.js';
-import { selectTheme, formatMenu, withCancel, CANCELLED } from '../utils/theme.js';
+import { selectTheme, promptTheme, formatMenu, withCancel, CANCELLED } from '../utils/theme.js';
 import pc from 'picocolors';
 
 export async function editCredentials() {
