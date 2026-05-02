@@ -1,95 +1,108 @@
+<div align="center">
+
 # CC Launcher
 
-![npm](https://img.shields.io/npm/v/cc-launcher)
-![license](https://img.shields.io/github/license/faizansf/cc-launcher)
-![downloads](https://img.shields.io/npm/dm/cc-launcher)
+*Switch Claude Code providers instantly — no config edits, no friction.*
+
+[![npm version](https://img.shields.io/npm/v/cc-launcher?style=flat-square)](https://www.npmjs.com/package/cc-launcher)
+[![Node.js](https://img.shields.io/badge/Node.js->=18-3c873a?style=flat-square)](https://nodejs.org)
+[![downloads](https://img.shields.io/npm/dm/cc-launcher?style=flat-square)](https://www.npmjs.com/package/cc-launcher)
+[![License](https://img.shields.io/github/license/faizansf/cc-launcher?style=flat-square)](LICENSE)
+
+[Why](#why) • [Run Claude Code for free](#run-claude-code-for-free) • [Quick start](#quick-start) • [Commands](#commands) • [Providers](#supported-providers)
 
 ![Demo](assets/demo--0.4.1.gif)
 
-**Switch Claude Code providers instantly. No config edits required.**
+</div>
 
-Run Claude Code with any provider or API key in seconds using a simple CLI.
+Run Claude Code with any Anthropic-compatible provider or API key in seconds. One command, zero config edits.
 
 ```bash
 npx cc-launcher
 ```
 
-## 🚀 Why CC Launcher?
+## Why
 
-Claude Code requires editing `~/.claude/settings.json` to switch providers. That process is slow, error-prone, and breaks flow.
+Claude Code reads provider settings from `~/.claude/settings.json`. Switching providers normally means hand-editing that file — slow, error-prone, breaks flow.
 
-CC Launcher solves this by:
+CC Launcher injects credentials at runtime instead:
 
-* Injecting environment variables at runtime
-* Keeping your config untouched
-* Letting you switch providers with a single command
+- Environment variables override settings per-launch
+- Your `settings.json` stays untouched
+- Switch providers with a single command or pick from a menu
 
-## ✨ Features
+## Run Claude Code for free
 
-* 🔁 **Instant provider switching**
-* 🔐 **Multiple credentials per provider**
-* ⚡ **Zero config changes required**
-* 🧪 **Supports local + cloud models**
-* 🧰 **CLI + automation friendly**
-* 🛡️ **Safe credential storage (0600 permissions)**
+Anthropic's hosted Claude Code requires a paid plan or API credits. Many third-party providers ship Anthropic-compatible endpoints with **free tiers or local-only inference**, so you can run Claude Code at zero cost.
 
-## 🔥 Common Use Cases
+| Provider | Free option |
+|----------|-------------|
+| **Ollama** | Fully local — no API key, no quota, Free cloud plan available for models like GPT-OSS 120B or QWEN-3.5 |
+| **LM Studio / vLLM** | Self-hosted, runs on your hardware |
+| **z.ai (GLM)** | Generous coding plan available |
+| **OpenRouter** | Free models (`:free` suffix) |
+| **DeepSeek / Qwen / Moonshot** | Generous free credits on signup |
 
-* Compare providers like OpenRouter, DeepSeek, Ollama
-* Switch between **work and personal API keys**
-* Use **cheap vs premium models** dynamically
-* Toggle between **local (Ollama) and cloud APIs**
-* Run Claude Code in **CI pipelines with env injection**
+> [!TIP]
+> Pair a local Ollama setup with CC Launcher to get an offline Claude Code workflow with no recurring cost.
 
-## ⚡ Quick Start
+## Features
+
+- Instant provider switching from a menu or by slug
+- Multiple credential sets per provider (work / personal / project)
+- Zero changes to `~/.claude/settings.json`
+- Works with cloud APIs and local runtimes (Ollama, LM Studio, vLLM)
+- Credential file stored at `0600` permissions
+- Args pass-through to `claude` for model overrides and flags
+- Scriptable for CI pipelines via `--print`
+
+## Quick start
 
 ```bash
-# Interactive setup
+# Interactive menu (add, edit, launch, list)
 npx cc-launcher
 
-# Pick credentials interactively and launch
+# Pick credentials interactively, then launch claude
 npx cc-launcher launch
 
 # Launch directly with a saved credential slug
 npx cc-launcher launch zai-personal
 
-# Pass arguments to Claude Code
+# Forward arguments to claude
 npx cc-launcher launch zai-personal -- --model sonnet
 ```
 
-First run takes ~10 seconds. After that, switching is instant.
+> [!NOTE]
+> First run takes ~10 seconds while `npx` fetches the package. After install, switching is instant.
 
-## 🎯 Commands
+## Commands
 
-| Command                        | Description                           |
-| ------------------------------ | ------------------------------------- |
-| `cc-launcher`                  | Interactive menu                      |
-| `cc-launcher list`             | List saved credentials                |
-| `cc-launcher launch`           | Pick credentials interactively        |
-| `cc-launcher launch <slug>`    | Launch with specific credentials      |
-| `cc-launcher launch <slug> --print` | Output env vars only             |
-| `cc-launcher launch <slug> -- <args>` | Forward args to Claude Code    |
-| `--credentials <slug>`         | Legacy alias for `launch <slug>`      |
+| Command | Description |
+|---------|-------------|
+| `cc-launcher` | Interactive menu |
+| `cc-launcher list` | List saved credentials |
+| `cc-launcher launch` | Pick credentials interactively, then launch |
+| `cc-launcher launch <slug>` | Launch with a specific credential |
+| `cc-launcher launch <slug> --print` | Print env vars and command, don't spawn |
+| `cc-launcher launch <slug> -- <args>` | Forward args verbatim to `claude` |
 
-## 🌐 Supported Providers
+## Use cases
 
-Works with any **Anthropic-compatible API**, including:
+- Compare providers side-by-side (OpenRouter vs DeepSeek vs z.ai)
+- Switch between work and personal API keys
+- Toggle between cheap and premium models per task
+- Run Claude Code fully offline against Ollama or LM Studio
+- Inject provider env vars in CI via `--print`
 
-* OpenRouter
-* DeepSeek
-* z.ai
-* Ollama
-* LM Studio
-* vLLM
-* LiteLLM
-* Fireworks AI
-* Qwen (Alibaba)
-* Cloudflare AI Gateway
-* Vercel AI Gateway
-* NVIDIA NIM
-* and more
+## Supported providers
 
-## 🧩 Add Your Own Provider
+Works with any Anthropic-compatible API. Built-in:
+
+OpenRouter · DeepSeek · z.ai (GLM) · Ollama · LM Studio · vLLM · LiteLLM · Fireworks AI · Qwen · Moonshot · MiniMax · Volcengine · Cloudflare AI Gateway · Vercel AI Gateway · NVIDIA NIM
+
+## Add your own provider
+
+Drop a file at `src/providers/<id>.js`:
 
 ```js
 export default {
@@ -102,26 +115,25 @@ export default {
 };
 ```
 
-Register it and it appears automatically in CLI.
+Register it in `src/providers/index.js` and it shows up automatically in the CLI.
 
-## 📁 Config
+## Config
 
-Stored at:
+Credentials live at `~/.claude-providers.json`:
 
-```
-~/.claude-providers.json
-```
+- File mode `0600` (owner read/write only)
+- Plaintext storage
 
-* Permission: `0600`
-* Plaintext storage (do not commit)
+> [!WARNING]
+> The config file holds API keys in plaintext. Don't commit it, don't sync it to public cloud storage, and review backups before sharing.
 
-## 📦 Install
+## Install
 
 ```bash
-# Recommended
+# Recommended — no install
 npx cc-launcher
 
-# Global
+# Global install
 npm install -g cc-launcher
 
 # From source
@@ -129,28 +141,13 @@ git clone https://github.com/faizansf/cc-launcher.git
 cd cc-launcher && npm link
 ```
 
-## 🛠 Requirements
+## Requirements
 
-* Node.js 18+
-* Claude Code installed (`claude` in PATH)
+- Node.js 18+
+- Claude Code installed and on `PATH` (`claude --version` should work)
 
-## ⭐ Why people star this repo
+## Roadmap
 
-* Saves time every day
-* Removes setup friction
-* Works with major LLM providers
-
-## 🚧 Roadmap
-
-* Add support for custom config file location
-* Enable network-based config loading via secure private sources (no public URL exposure)
-* Allow centralized config distribution within trusted environments
-* Improve team collaboration without sharing API keys directly
-
-## 🤝 Contributing
-
-PRs welcome. Add providers, improve UX, or suggest features.
-
-## 📄 License
-
-MIT
+- Custom config file location
+- Network-based config loading from trusted private sources
+- Centralized config distribution for teams without sharing keys directly
