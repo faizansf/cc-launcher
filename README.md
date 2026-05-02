@@ -87,7 +87,7 @@ npx cc-launcher launch zai-personal -- --model sonnet
 | `cc-launcher launch <slug> -- <args>` | Forward args verbatim to `claude` |
 
 ## Use cases
-
+- Use Claude Code free without any subscription
 - Compare providers side-by-side (OpenRouter vs DeepSeek vs z.ai)
 - Switch between work and personal API keys
 - Toggle between cheap and premium models per task
