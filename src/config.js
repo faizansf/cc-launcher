@@ -1,12 +1,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import os from 'node:os';
+import { getConfigPath } from './settings.js';
 
-const CONFIG_PATH = path.join(os.homedir(), '.claude-providers.json');
 const FILE_MODE = 0o600;
 const DIR_MODE = 0o700;
 
-export { CONFIG_PATH };
+// Re-exported so callers can display the current path. Always read fresh —
+// the user can change it via the Settings menu at runtime.
+export { getConfigPath };
 
 export class ConfigCorruptError extends Error {
   constructor(path, cause) {
@@ -31,18 +32,19 @@ export class ConfigAccessError extends Error {
 // Top-level key is "credentials" — each entry is a saved set of credentials
 // for a provider (e.g. one z.ai key for personal use, another for work).
 export function loadConfig() {
+  const configPath = getConfigPath();
   let data;
   try {
-    data = fs.readFileSync(CONFIG_PATH, 'utf-8');
+    data = fs.readFileSync(configPath, 'utf-8');
   } catch (err) {
     if (err.code === 'ENOENT') return { credentials: {} };
-    throw new ConfigAccessError(CONFIG_PATH, err);
+    throw new ConfigAccessError(configPath, err);
   }
   if (process.platform !== 'win32') {
     try {
-      const stat = fs.statSync(CONFIG_PATH);
+      const stat = fs.statSync(configPath);
       if ((stat.mode & 0o077) !== 0) {
-        fs.chmodSync(CONFIG_PATH, FILE_MODE);
+        fs.chmodSync(configPath, FILE_MODE);
       }
     } catch {
       // Best-effort; a chmod failure here should not block reads.
@@ -52,7 +54,7 @@ export function loadConfig() {
   try {
     parsed = JSON.parse(data);
   } catch (err) {
-    throw new ConfigCorruptError(CONFIG_PATH, err);
+    throw new ConfigCorruptError(configPath, err);
   }
   // Ensure the credentials key exists even if a hand-edited file is missing it.
   if (!parsed.credentials || typeof parsed.credentials !== 'object') {
@@ -87,15 +89,16 @@ export function loadConfig() {
 }
 
 export function saveConfig(config) {
-  const dir = path.dirname(CONFIG_PATH);
+  const configPath = getConfigPath();
+  const dir = path.dirname(configPath);
   try {
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true, mode: DIR_MODE });
     }
-    fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2), { encoding: 'utf-8', mode: FILE_MODE });
-    fs.chmodSync(CONFIG_PATH, FILE_MODE);
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2), { encoding: 'utf-8', mode: FILE_MODE });
+    fs.chmodSync(configPath, FILE_MODE);
   } catch (err) {
-    throw new ConfigAccessError(CONFIG_PATH, err);
+    throw new ConfigAccessError(configPath, err);
   }
 }
 

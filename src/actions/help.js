@@ -1,6 +1,7 @@
 import { input } from '@inquirer/prompts';
 import pc from 'picocolors';
-import { CONFIG_PATH } from '../config.js';
+import { getConfigPath } from '../config.js';
+import { SETTINGS_PATH, listProfiles, getActiveProfile } from '../settings.js';
 import { getAllProviders } from '../providers/index.js';
 import { promptTheme, orange, getVersion, withCancel } from '../utils/theme.js';
 
@@ -34,6 +35,8 @@ export async function showHelp() {
   console.log(`   ${pc.dim('$')} cc-launcher launch <slug> --print           ${pc.dim('# show env vars only')}`);
   console.log(`   ${pc.dim('$')} cc-launcher launch <slug> -- <args>         ${pc.dim('# pass args to claude')}`);
   console.log(`   ${pc.dim('$')} cc-launcher --credentials <slug>            ${pc.dim('# legacy: same as launch <slug>')}`);
+  console.log(`   ${pc.dim('$')} cc-launcher --profile <label> ...           ${pc.dim('# use a saved profile (one-shot)')}`);
+  console.log(`   ${pc.dim('$')} cc-launcher --config <path> ...             ${pc.dim('# ad-hoc credentials path (one-shot)')}`);
   console.log();
 
   const providers = getAllProviders();
@@ -43,8 +46,19 @@ export async function showHelp() {
     console.log();
   }
 
-  console.log(`  ${pc.bold('Config')}`);
-  console.log(`   ${CONFIG_PATH}   ${pc.dim('(mode 0600; plaintext keys — do not commit)')}`);
+  const profiles = listProfiles();
+  const activeLabel = getActiveProfile().label;
+  console.log(`  ${pc.bold('Profiles')}`);
+  for (const [label, p] of Object.entries(profiles)) {
+    const marker = label === activeLabel ? pc.green(' (active)') : '';
+    console.log(`   ${pc.bold(label)}${marker}  ${pc.dim(p)}`);
+  }
+  console.log(pc.dim(`   Manage in Settings · switch with --profile <label>`));
+  console.log();
+
+  console.log(`  ${pc.bold('Files')}`);
+  console.log(`   ${SETTINGS_PATH}        ${pc.dim('(settings — fixed location)')}`);
+  console.log(`   ${getConfigPath()}   ${pc.dim('(credentials — mode 0600; plaintext keys — do not commit)')}`);
   console.log();
 
   console.log(`  ${pc.bold('Project')}`);

@@ -25,7 +25,34 @@ describe('maskSecret', () => {
 describe('parseArgs', () => {
   it('returns defaults for empty argv', () => {
     const result = parseArgs([]);
-    assert.deepStrictEqual(result, { credentials: null, print: false, command: null, claudeArgs: [] });
+    assert.deepStrictEqual(result, {
+      credentials: null,
+      print: false,
+      command: null,
+      commandArg: null,
+      claudeArgs: [],
+      profile: null,
+      configOverride: null,
+      error: null,
+    });
+  });
+
+  it('extracts --profile label', () => {
+    const result = parseArgs(['--profile', 'office']);
+    assert.strictEqual(result.profile, 'office');
+    assert.strictEqual(result.configOverride, null);
+    assert.strictEqual(result.error, null);
+  });
+
+  it('extracts --config path', () => {
+    const result = parseArgs(['--config', '/tmp/foo.json']);
+    assert.strictEqual(result.configOverride, '/tmp/foo.json');
+    assert.strictEqual(result.profile, null);
+  });
+
+  it('flags --profile and --config as mutually exclusive', () => {
+    const result = parseArgs(['--profile', 'a', '--config', '/x']);
+    assert.match(result.error, /mutually exclusive/);
   });
 
   it('extracts --credentials slug', () => {

@@ -12,7 +12,15 @@ import { listCredentials } from './actions/list.js';
 import { useCredentials } from './actions/use.js';
 import { launchDefault } from './actions/default.js';
 import { showHelp } from './actions/help.js';
+import { settingsAction } from './actions/settings.js';
 import { ConfigCorruptError, ConfigAccessError } from './config.js';
+import {
+  migrateLegacyConfig,
+  setRuntimeConfigPath,
+  expandPath,
+  listProfiles,
+  getActiveProfile,
+} from './settings.js';
 
 function reportFatal(err) {
   if (err instanceof ConfigCorruptError) {
@@ -28,8 +36,56 @@ function reportFatal(err) {
   throw err;
 }
 
+function announceMigration(result) {
+  if (!result) return;
+  console.log(pc.yellow(`\n  Renamed credentials file:`));
+  console.log(`    ${pc.dim('from')}  ${result.from}`);
+  console.log(`    ${pc.dim('to  ')}  ${result.to}`);
+  console.log(pc.dim(`  cc-launcher now uses the new name by default. No action needed.\n`));
+}
+
+// Print the active-profile status line below the banner. Reflects CLI
+// overrides — `--config <path>` shows as `(ad-hoc)` since it bypasses any
+// saved profile, and `--profile <label>` shows the resolved label.
+function printProfileStatus(args) {
+  if (args.configOverride) {
+    console.log(`  ${pc.dim('Profile:')}  ${pc.bold('(ad-hoc)')}  ${pc.dim('·')}  ${expandPath(args.configOverride)}\n`);
+    return;
+  }
+  const label = args.profile || getActiveProfile().label;
+  const profiles = listProfiles();
+  const path = profiles[label] || getActiveProfile().path;
+  console.log(`  ${pc.dim('Profile:')}  ${pc.bold(label)}  ${pc.dim('·')}  ${path}\n`);
+}
+
+// Resolve --profile / --config into a runtime override on the credentials
+// path. Both flags affect this run only — the active profile in settings.json
+// is not modified. Mutually exclusive (validated by parseArgs).
+function applyOverrides(args) {
+  if (args.error) {
+    console.error(pc.red(`\n  ${args.error}\n`));
+    process.exit(1);
+  }
+  if (args.configOverride) {
+    setRuntimeConfigPath(expandPath(args.configOverride));
+    return;
+  }
+  if (args.profile) {
+    const profiles = listProfiles();
+    if (!Object.prototype.hasOwnProperty.call(profiles, args.profile)) {
+      const available = Object.keys(profiles).join(', ') || '(none)';
+      console.error(pc.red(`\n  Unknown profile: "${args.profile}"`));
+      console.error(pc.dim(`  Available profiles: ${available}\n`));
+      process.exit(1);
+    }
+    setRuntimeConfigPath(profiles[args.profile]);
+  }
+}
+
 async function main() {
+  announceMigration(migrateLegacyConfig());
   const args = parseArgs(process.argv.slice(2));
+  applyOverrides(args);
 
   // Non-interactive: --credentials flag
   if (args.credentials) {
@@ -61,18 +117,24 @@ async function main() {
   let result;
   do {
     showBanner();
+    printProfileStatus(args);
 
+    const menuChoices = formatMenu([
+      { label: 'Launch with provider', desc: 'run Claude Code with saved credentials',  value: 'use' },
+      { label: 'Launch default',       desc: 'run with official Anthropic settings',    value: 'default' },
+      { label: 'Add credentials',      desc: 'save new credentials for a provider',     value: 'add' },
+      { label: 'Edit credentials',     desc: 'modify a saved set',                      value: 'edit' },
+      { label: 'Delete credentials',   desc: 'remove a saved set',                      value: 'delete' },
+      { label: 'Settings',             desc: 'configure cc-launcher',                   value: 'settings' },
+      { label: 'Help',                 desc: 'about cc-launcher',                       value: 'help' },
+      { label: 'Exit',                                                                   value: 'exit' },
+    ]);
     let action = await withCancel(select, {
       message: '',
-      choices: formatMenu([
-        { label: 'Launch with provider', desc: 'run Claude Code with saved credentials',  value: 'use' },
-        { label: 'Launch default',       desc: 'run with official Anthropic settings',    value: 'default' },
-        { label: 'Add credentials',      desc: 'save new credentials for a provider',     value: 'add' },
-        { label: 'Edit credentials',     desc: 'modify a saved set',                      value: 'edit' },
-        { label: 'Delete credentials',   desc: 'remove a saved set',                      value: 'delete' },
-        { label: 'Help',                 desc: 'about cc-launcher',                       value: 'help' },
-        { label: 'Exit',                                                                   value: 'exit' },
-      ]),
+      choices: menuChoices,
+      // Render every entry without paging — default pageSize (7) clips the
+      // last items and makes the menu feel like it scrolls mid-list.
+      pageSize: menuChoices.length,
       // Suppress the "? <message>" header — the menu is self-explanatory.
       theme: { ...promptTheme, prefix: '' },
     });
@@ -120,6 +182,10 @@ async function main() {
       case 'help':
         await showHelp();
         result = 'back';
+        break;
+
+      case 'settings':
+        result = await settingsAction();
         break;
     }
   } while (result !== 'exit');

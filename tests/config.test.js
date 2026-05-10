@@ -17,7 +17,7 @@ import {
 describe('Config Module', () => {
   let originalData = null;
   let configExists = false;
-  const configPath = path.join(os.homedir(), '.claude-providers.json');
+  const configPath = path.join(os.homedir(), '.cc-launcher-providers.json');
 
   beforeEach(() => {
     try {

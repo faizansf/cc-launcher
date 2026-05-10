@@ -1,5 +1,14 @@
 export function parseArgs(argv) {
-  const result = { credentials: null, print: false, command: null, commandArg: null, claudeArgs: [] };
+  const result = {
+    credentials: null,
+    print: false,
+    command: null,
+    commandArg: null,
+    claudeArgs: [],
+    profile: null,
+    configOverride: null,
+    error: null,
+  };
 
   const separatorIndex = argv.indexOf('--');
   const ourArgs = separatorIndex === -1 ? argv : argv.slice(0, separatorIndex);
@@ -8,6 +17,10 @@ export function parseArgs(argv) {
   for (let i = 0; i < ourArgs.length; i++) {
     if (ourArgs[i] === '--credentials' && ourArgs[i + 1]) {
       result.credentials = ourArgs[++i];
+    } else if (ourArgs[i] === '--profile' && ourArgs[i + 1]) {
+      result.profile = ourArgs[++i];
+    } else if (ourArgs[i] === '--config' && ourArgs[i + 1]) {
+      result.configOverride = ourArgs[++i];
     } else if (ourArgs[i] === '--print') {
       result.print = true;
     } else if (!ourArgs[i].startsWith('-')) {
@@ -17,6 +30,10 @@ export function parseArgs(argv) {
         result.commandArg = ourArgs[i];
       }
     }
+  }
+
+  if (result.profile && result.configOverride) {
+    result.error = '--profile and --config are mutually exclusive — pick one.';
   }
 
   return result;

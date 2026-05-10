@@ -119,13 +119,26 @@ Register it in `src/providers/index.js` and it shows up automatically in the CLI
 
 ## Config
 
-Credentials live at `~/.claude-providers.json`:
+Two files:
 
-- File mode `0600` (owner read/write only)
-- Plaintext storage
+- `~/.cc-launcher.json` — settings (active profile + registered profile paths). Fixed location.
+- `<credentials path>` — credentials JSON, mode `0600`, plaintext. Default: `~/.cc-launcher-providers.json`. Path is driven by the active profile.
 
 > [!WARNING]
-> The config file holds API keys in plaintext. Don't commit it, don't sync it to public cloud storage, and review backups before sharing.
+> The credentials file holds API keys in plaintext. Don't commit it, don't sync it to public cloud storage, and review backups before sharing.
+
+### Profiles
+
+A profile is a label paired with a credentials file path. Switch contexts (personal, office, cheap-models, …) without retyping paths. Manage profiles in **Settings → Switch / Add / Edit / Delete profile**.
+
+CLI overrides (one-shot, do not modify settings):
+
+```bash
+cc-launcher --profile office launch zai          # use saved profile "office" for this run
+cc-launcher --config /tmp/test.json list         # ad-hoc credentials path
+```
+
+`--profile` and `--config` are mutually exclusive.
 
 ## Install
 
