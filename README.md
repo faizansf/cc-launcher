@@ -194,6 +194,4 @@ cd cc-launcher && npm link
 
 ## Roadmap
 
-- Custom config file location
-- Network-based config loading from trusted private sources
-- Centralized config distribution for teams without sharing keys directly
+- At-rest encryption for credentials files
