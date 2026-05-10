@@ -129,16 +129,49 @@ Two files:
 
 ### Profiles
 
-A profile is a label paired with a credentials file path. Switch contexts (personal, office, cheap-models, …) without retyping paths. Manage profiles in **Settings → Switch / Add / Edit / Delete profile**.
+A profile is a label paired with a credentials file path. Each profile holds its own set of credentials — switch contexts without retyping paths or editing files.
 
-CLI overrides (one-shot, do not modify settings):
+**Common setups:**
+
+| Profile | Credentials file | Why |
+|---------|-----------------|-----|
+| `default` | `~/.cc-launcher-providers.json` | Personal keys, day-to-day use |
+| `office` | `~/work/.cc-launcher-work.json` | Work API keys, separate billing |
+| `cheap-models` | `~/.cc-launcher-cheap.json` | Free/low-cost providers only |
+| `ci` | `/etc/cc-launcher-ci.json` | Read-only path injected in CI |
+
+**Manage profiles interactively:**
+
+```
+cc-launcher → Settings → Manage profiles
+```
+
+From there you can add, rename, change path, delete, or switch the active profile.
+
+**CLI overrides** — one-shot, never modify saved settings:
 
 ```bash
-cc-launcher --profile office launch zai          # use saved profile "office" for this run
-cc-launcher --config /tmp/test.json list         # ad-hoc credentials path
+cc-launcher --profile office launch zai          # use "office" profile this run
+cc-launcher --profile office list                # list credentials from "office" profile
+cc-launcher --config /tmp/test.json list         # ad-hoc path, no profile needed
 ```
 
 `--profile` and `--config` are mutually exclusive.
+
+**How it works:**
+
+- `~/.cc-launcher.json` stores `{ activeProfile, profiles: { <label>: <path> } }`. Fixed location.
+- Active profile's path drives which credentials file is read and written.
+- On first run, a `default` profile pointing at `~/.cc-launcher-providers.json` is created automatically.
+- Deleting the active profile is blocked — switch first, then delete.
+- Profile labels are slugified (lowercase, non-alphanumerics → `-`).
+
+**Tip:** use `--profile` in shell aliases to switch contexts without touching the active profile:
+
+```bash
+alias cc-work="cc-launcher --profile office launch"
+alias cc-cheap="cc-launcher --profile cheap-models launch"
+```
 
 ## Install
 
