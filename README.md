@@ -6,7 +6,6 @@
 
 [![npm version](https://img.shields.io/npm/v/cc-launcher?style=flat-square)](https://www.npmjs.com/package/cc-launcher)
 [![Node.js](https://img.shields.io/badge/Node.js->=18-3c873a?style=flat-square)](https://nodejs.org)
-[![downloads](https://img.shields.io/npm/dm/cc-launcher?style=flat-square)](https://www.npmjs.com/package/cc-launcher)
 [![License](https://img.shields.io/github/license/faizansf/cc-launcher?style=flat-square)](LICENSE)
 
 [Why](#why) • [Run Claude Code for free](#run-claude-code-for-free) • [Quick start](#quick-start) • [Commands](#commands) • [Providers](#supported-providers)
